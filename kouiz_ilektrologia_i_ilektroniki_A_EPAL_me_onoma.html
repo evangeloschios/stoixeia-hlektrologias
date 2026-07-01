@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Κουίζ: Ηλεκτρολογία ή Ηλεκτρονική;</title>
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1e40af;
+      --light-blue: #dbeafe;
+      --green: #16a34a;
+      --red: #dc2626;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #1d4ed8, #60a5fa);
+      color: white;
+      padding: 24px 32px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      line-height: 1.2;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .author-name {
+      font-size: clamp(0.82rem, 1.25vw, 1.05rem);
+      font-weight: 600;
+      opacity: 0.82;
+      white-space: nowrap;
+    }
+    .subtitle {
+      margin-top: 8px;
+      font-size: clamp(1rem, 1.4vw, 1.25rem);
+      opacity: 0.96;
+    }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+    .top-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+    .instructions, .score-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+      font-size: clamp(1rem, 1.3vw, 1.2rem);
+      line-height: 1.45;
+    }
+    .score-card {
+      min-width: 210px;
+      text-align: center;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: var(--blue-dark);
+      background: #eff6ff;
+    }
+    .quiz-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: clamp(18px, 3vw, 34px);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      min-height: 450px;
+      display: grid;
+      gap: 20px;
+      align-content: center;
+    }
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+    .bar {
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      flex: 1;
+      min-width: 160px;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--blue);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+    .example-label {
+      text-align: center;
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+    .example {
+      text-align: center;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      color: #111827;
+      line-height: 1.1;
+      padding: 8px 0 2px;
+    }
+    .hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+      min-height: 32px;
+    }
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 8px;
+    }
+    .answer-btn {
+      border: none;
+      border-radius: 20px;
+      padding: clamp(18px, 2.5vw, 30px);
+      cursor: pointer;
+      font-size: clamp(1.35rem, 2.5vw, 2.2rem);
+      font-weight: 900;
+      color: white;
+      transition: transform 0.1s, filter 0.15s, box-shadow 0.15s;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+    }
+    .answer-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
+    .answer-btn:active { transform: translateY(1px); }
+    .answer-btn.elec { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .answer-btn.electronics { background: linear-gradient(135deg, #7c3aed, #4c1d95); }
+    .answer-btn.disabled {
+      pointer-events: none;
+      opacity: 0.72;
+    }
+    .feedback {
+      min-height: 88px;
+      border-radius: 18px;
+      border: 2px solid var(--line);
+      background: #f9fafb;
+      padding: 14px 16px;
+      font-size: clamp(1rem, 1.4vw, 1.2rem);
+      line-height: 1.45;
+    }
+    .feedback.good {
+      background: #f0fdf4;
+      border-color: #86efac;
+      color: #14532d;
+    }
+    .feedback.bad {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #7f1d1d;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    button.control {
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--blue);
+      color: white;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.24);
+    }
+    button.control.secondary {
+      background: #374151;
+      box-shadow: 0 4px 10px rgba(55, 65, 81, 0.20);
+    }
+    button.control.light {
+      background: white;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+    .end-screen {
+      text-align: center;
+      display: none;
+      gap: 18px;
+    }
+    .end-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      color: var(--blue-dark);
+    }
+    .end-score {
+      font-size: clamp(1.3rem, 2.2vw, 2rem);
+      font-weight: 800;
+    }
+    .review {
+      text-align: left;
+      background: #f9fafb;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 16px;
+      max-height: 280px;
+      overflow: auto;
+      line-height: 1.45;
+      font-size: 1rem;
+    }
+    .review-item {
+      padding: 9px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .review-item:last-child { border-bottom: none; }
+    details.teacher {
+      margin-top: 18px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 16px;
+      line-height: 1.45;
+    }
+    details.teacher summary {
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--blue-dark);
+      font-size: 1.1rem;
+    }
+    .mini-table {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .mini-row {
+      display: grid;
+      grid-template-columns: 1fr 160px;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .tag {
+      font-weight: 900;
+      color: #111827;
+    }
+    @media (max-width: 800px) {
+      .top-row { grid-template-columns: 1fr; }
+      .answers { grid-template-columns: 1fr; }
+      .mini-row { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: white; }
+      header, .controls, .answers, details.teacher { display: none; }
+      .quiz-card, .instructions, .score-card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Κουίζ: Ηλεκτρολογία ή Ηλεκτρονική; <span class="author-name">(Ε. Κοκκώδης)</span></h1>
+    <div class="subtitle">Αρχές Ηλεκτρολογίας και Ηλεκτρονικής – Α΄ ΕΠΑΛ – 1η Διδακτική Ώρα</div>
+  </header>
+
+  <main>
+    <section class="top-row">
+      <div class="instructions">
+        Δες το παράδειγμα που εμφανίζεται στην οθόνη και διάλεξε σε ποια περιοχή ανήκει περισσότερο. 
+        Η Ηλεκτρολογία χρησιμοποιεί τον ηλεκτρισμό κυρίως για ενέργεια, ενώ η Ηλεκτρονική κυρίως για σήματα και πληροφορία.
+      </div>
+      <div class="score-card">
+        <div>
+          Βαθμολογία<br>
+          <span id="score">0</span>/<span id="total">0</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="quiz-card">
+      <div id="questionScreen">
+        <div class="progress">
+          <span id="questionNumber">Ερώτηση 1</span>
+          <div class="bar"><div id="barFill" class="bar-fill"></div></div>
+          <span id="remaining">0 απομένουν</span>
+        </div>
+
+        <div class="example-label">Παράδειγμα</div>
+        <div id="example" class="example">Λαμπτήρας</div>
+        <div id="hint" class="hint">Σκέψου: χρησιμοποιείται κυρίως για ενέργεια ή για πληροφορία;</div>
+
+        <div class="answers">
+          <button class="answer-btn elec" onclick="answer('Ηλεκτρολογία')">Ηλεκτρολογία</button>
+          <button class="answer-btn electronics" onclick="answer('Ηλεκτρονική')">Ηλεκτρονική</button>
+        </div>
+
+        <div id="feedback" class="feedback">Επίλεξε μία από τις δύο περιοχές.</div>
+
+        <div class="controls">
+          <button id="nextBtn" class="control" onclick="nextQuestion()" style="display:none;">Επόμενο</button>
+          <button class="control light" onclick="toggleFullscreen()">Πλήρης οθόνη</button>
+          <button class="control secondary" onclick="restartQuiz()">Επαναφορά</button>
+        </div>
+      </div>
+
+      <div id="endScreen" class="end-screen">
+        <div class="end-title">Τέλος κουίζ</div>
+        <div id="endScore" class="end-score"></div>
+        <div id="endMessage"></div>
+        <div id="review" class="review"></div>
+        <div class="controls">
+          <button class="control" onclick="restartQuiz()">Ξανά από την αρχή</button>
+          <button class="control light" onclick="toggleFullscreen()">Πλήρης οθόνη</button>
+        </div>
+      </div>
+    </section>
+
+    <details class="teacher">
+      <summary>Προτεινόμενη χρήση στην τάξη</summary>
+      Το κουίζ μπορεί να προβληθεί στον διαδραστικό πίνακα στο τέλος της 1ης ώρας ή στην αρχή της επόμενης για επανάληψη. 
+      Μπορεί να απαντά ένας μαθητής κάθε φορά ή να γίνεται ψηφοφορία από όλη την τάξη πριν πατηθεί η απάντηση.
+      <div class="mini-table" id="teacherList"></div>
+    </details>
+  </main>
+
+  <script>
+    const allQuestions = [
+      { example: "Λαμπτήρας", area: "Ηλεκτρολογία", explanation: "Ο λαμπτήρας χρησιμοποιεί την ηλεκτρική ενέργεια κυρίως για να παράγει φως." },
+      { example: "Θερμοσίφωνας", area: "Ηλεκτρολογία", explanation: "Ο θερμοσίφωνας μετατρέπει την ηλεκτρική ενέργεια σε θερμότητα για να ζεστάνει νερό." },
+      { example: "Ηλεκτρικός κινητήρας", area: "Ηλεκτρολογία", explanation: "Ο ηλεκτρικός κινητήρας μετατρέπει την ηλεκτρική ενέργεια σε κίνηση." },
+      { example: "Πρίζα", area: "Ηλεκτρολογία", explanation: "Η πρίζα ανήκει στην ηλεκτρική εγκατάσταση και παρέχει ηλεκτρική ενέργεια στις συσκευές." },
+      { example: "Ηλεκτρικός πίνακας", area: "Ηλεκτρολογία", explanation: "Ο ηλεκτρικός πίνακας μοιράζει και προστατεύει τα κυκλώματα μιας ηλεκτρικής εγκατάστασης." },
+      { example: "Γραμμές μεταφοράς ηλεκτρικής ενέργειας", area: "Ηλεκτρολογία", explanation: "Οι γραμμές μεταφοράς μεταφέρουν ηλεκτρική ενέργεια από τους σταθμούς παραγωγής στους καταναλωτές." },
+      { example: "Κινητό τηλέφωνο", area: "Ηλεκτρονική", explanation: "Το κινητό χρησιμοποιεί ηλεκτρικά σήματα για επικοινωνία, δεδομένα, εικόνα και ήχο." },
+      { example: "Υπολογιστής", area: "Ηλεκτρονική", explanation: "Ο υπολογιστής επεξεργάζεται και αποθηκεύει πληροφορίες με ηλεκτρονικά κυκλώματα." },
+      { example: "Τηλεχειριστήριο", area: "Ηλεκτρονική", explanation: "Το τηλεχειριστήριο στέλνει εντολές με σήματα προς μια συσκευή." },
+      { example: "Αισθητήρας κίνησης", area: "Ηλεκτρονική", explanation: "Ο αισθητήρας ανιχνεύει μια κατάσταση και στέλνει ηλεκτρικό σήμα ή πληροφορία." },
+      { example: "Πλακέτα ηλεκτρονικού κυκλώματος", area: "Ηλεκτρονική", explanation: "Η πλακέτα περιέχει ηλεκτρονικά εξαρτήματα που επεξεργάζονται σήματα." },
+      { example: "Σύστημα συναγερμού", area: "Ηλεκτρονική", explanation: "Το σύστημα συναγερμού χρησιμοποιεί αισθητήρες και σήματα για ανίχνευση και ειδοποίηση." },
+      { example: "Τηλεόραση", area: "Ηλεκτρονική", explanation: "Η τηλεόραση επεξεργάζεται σήματα εικόνας και ήχου. Περιέχει βέβαια και τροφοδοτικό, αλλά κυρίως τη μελετάμε ως ηλεκτρονική εφαρμογή." },
+      { example: "Φορτιστής κινητού", area: "Ηλεκτρολογία", explanation: "Ο φορτιστής παρέχει ηλεκτρική ενέργεια στη μπαταρία. Περιέχει ηλεκτρονικά, αλλά εδώ τον βλέπουμε κυρίως ως παροχή ενέργειας." },
+      { example: "Ανελκυστήρας", area: "Ηλεκτρολογία", explanation: "Ο ανελκυστήρας χρησιμοποιεί ηλεκτρική ενέργεια για κίνηση. Έχει και ηλεκτρονικό έλεγχο, αλλά εδώ τον κατατάσσουμε κυρίως στην Ηλεκτρολογία." }
+    ];
+
+    let questions = [];
+    let current = 0;
+    let score = 0;
+    let answered = false;
+    let results = [];
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function restartQuiz() {
+      questions = shuffle(allQuestions);
+      current = 0;
+      score = 0;
+      answered = false;
+      results = [];
+      document.getElementById("questionScreen").style.display = "block";
+      document.getElementById("endScreen").style.display = "none";
+      document.querySelector(".quiz-card").style.alignContent = "center";
+      document.getElementById("total").textContent = questions.length;
+      updateQuestion();
+      buildTeacherList();
+    }
+
+    function updateQuestion() {
+      answered = false;
+      const q = questions[current];
+      document.getElementById("example").textContent = q.example;
+      document.getElementById("hint").textContent = "Σκέψου: χρησιμοποιείται κυρίως για ενέργεια ή για πληροφορία;";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("feedback").textContent = "Επίλεξε μία από τις δύο περιοχές.";
+      document.getElementById("questionNumber").textContent = "Ερώτηση " + (current + 1);
+      document.getElementById("remaining").textContent = (questions.length - current - 1) + " απομένουν";
+      document.getElementById("score").textContent = score;
+      document.getElementById("barFill").style.width = ((current / questions.length) * 100) + "%";
+      document.getElementById("nextBtn").style.display = "none";
+      document.querySelectorAll(".answer-btn").forEach(btn => btn.classList.remove("disabled"));
+    }
+
+    function answer(choice) {
+      if (answered) return;
+      answered = true;
+      const q = questions[current];
+      const isCorrect = choice === q.area;
+
+      if (isCorrect) {
+        score++;
+        document.getElementById("feedback").className = "feedback good";
+        document.getElementById("feedback").innerHTML = "<strong>Σωστά!</strong> " + q.explanation;
+      } else {
+        document.getElementById("feedback").className = "feedback bad";
+        document.getElementById("feedback").innerHTML = "<strong>Όχι ακριβώς.</strong> Η σωστή απάντηση είναι <strong>" + q.area + "</strong>. " + q.explanation;
+      }
+
+      results.push({ example: q.example, correct: q.area, choice: choice, ok: isCorrect });
+      document.getElementById("score").textContent = score;
+      document.querySelectorAll(".answer-btn").forEach(btn => btn.classList.add("disabled"));
+      document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      if (!answered) return;
+      current++;
+      if (current >= questions.length) {
+        showEndScreen();
+      } else {
+        updateQuestion();
+      }
+    }
+
+    function showEndScreen() {
+      document.getElementById("questionScreen").style.display = "none";
+      document.getElementById("endScreen").style.display = "grid";
+      document.querySelector(".quiz-card").style.alignContent = "start";
+      document.getElementById("barFill").style.width = "100%";
+      document.getElementById("endScore").textContent = "Τελική βαθμολογία: " + score + "/" + questions.length;
+
+      const percent = score / questions.length;
+      let message = "";
+      if (percent === 1) message = "Άριστα! Ξεχώρισες όλες τις εφαρμογές.";
+      else if (percent >= 0.75) message = "Πολύ καλά! Έχεις καταλάβει τη βασική διαφορά.";
+      else if (percent >= 0.5) message = "Καλή προσπάθεια. Θέλει λίγη ακόμα εξάσκηση στα παραδείγματα.";
+      else message = "Χρειάζεται επανάληψη στη βασική διάκριση: ενέργεια ή πληροφορία.";
+      document.getElementById("endMessage").textContent = message;
+
+      const review = document.getElementById("review");
+      review.innerHTML = "<strong>Ανασκόπηση απαντήσεων</strong>";
+      results.forEach((r, i) => {
+        const item = document.createElement("div");
+        item.className = "review-item";
+        item.innerHTML = (i + 1) + ". <strong>" + r.example + "</strong>: σωστή περιοχή <strong>" + r.correct + "</strong>. Η απάντηση ήταν " + (r.ok ? "σωστή" : "λανθασμένη") + ".";
+        review.appendChild(item);
+      });
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function buildTeacherList() {
+      const list = document.getElementById("teacherList");
+      list.innerHTML = "";
+      allQuestions.forEach(q => {
+        const row = document.createElement("div");
+        row.className = "mini-row";
+        row.innerHTML = "<div>" + q.example + "</div><div class='tag'>" + q.area + "</div>";
+        list.appendChild(row);
+      });
+    }
+
+    restartQuiz();
+  </script>
+</body>
+</html>
